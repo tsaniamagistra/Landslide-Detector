@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sensor Data</title>
+</head>
+<body>
+  <h1>Data Sensor</h1>
+  <table id="sensorTable">
+    <thead>
+      <tr>
+        <th>Humidity</th>
+        <th>Vibration</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+  <script>
+    async function fetchData() {
+      try {
+        const response = await axios.get('http://localhost:9000/view-log');
+        const sensorData = response.data.data;
+        
+        const sensorTableBody = document.querySelector('#sensorTable tbody');
+        sensorTableBody.innerHTML = '';
+
+        sensorData.forEach(data => {
+          const row = sensorTableBody.insertRow();
+          const humidityCell = row.insertCell(0);
+          const vibrationCell = row.insertCell(1);
+
+          humidityCell.textContent = data.humidity;
+          vibrationCell.textContent = data.vibration;
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    window.onload = fetchData;
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "iot-longsor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/webapi/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.2",
+    "mysql2": "^3.6.3"
+  }
+}
