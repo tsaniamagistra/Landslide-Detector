@@ -5,7 +5,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'longsor_log'
+    database: 'nodemcu_log'
 });
 
 pool.getConnection((err, connection) => {

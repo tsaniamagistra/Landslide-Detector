@@ -1,7 +1,9 @@
-const insertLogHandler = async (request, h) => {
-  const { hum, vibr } = request.payload;
+const dbPool = require('./database');
 
-  if (hum === undefined || vibr === undefined) {
+const insertLogHandler = async (request, h) => {
+  const { moist, vibr } = request.payload;
+
+  if (moist === undefined || vibr === undefined) {
     const response = h.response({
       status: 'fail',
       message: 'Gagal menyimpan log. Data kelembaban dan getaran diperlukan.',
@@ -13,9 +15,9 @@ const insertLogHandler = async (request, h) => {
   try {
     const currentTime = new Date().toISOString();
 
-    const [result] = await request.server.app.dbPool.query(
-      'INSERT INTO log_table (hum, vibr, log_time) VALUES (?, ?, CONVERT_TZ(?, "+00:00", "+07:00"))',
-      [hum, vibr, currentTime]
+    const [result] = await dbPool.query(
+      'INSERT INTO log (soil_moisture, vibration, log_time) VALUES (?, ?, CONVERT_TZ(?, "+00:00", "+07:00"))',
+      [moist, vibr, currentTime]
     );
 
     if (result.affectedRows > 0) {
@@ -40,7 +42,7 @@ const insertLogHandler = async (request, h) => {
 
 const viewLogHandler = async (request, h) => {
   try {
-    const [rows] = await request.server.app.dbPool.query('SELECT * FROM log_table');
+    const [rows] = await dbPool.query('SELECT * FROM log');
     
     return {
       status: 'success',
