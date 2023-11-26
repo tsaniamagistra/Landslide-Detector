@@ -42,7 +42,9 @@ const insertLogHandler = async (request, h) => {
 
 const viewLogHandler = async (request, h) => {
   try {
-    const [rows] = await dbPool.query('SELECT * FROM log');
+    const [rows] = await dbPool.query(
+      'SELECT * FROM log ORDER BY log_time DESC LIMIT 10'
+    );
     
     return {
       status: 'success',

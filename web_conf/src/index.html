@@ -9,6 +9,7 @@
   <table id="sensorTable">
     <thead>
       <tr>
+        <th>Log Time</th>
         <th>Soil Moisture</th>
         <th>Vibration</th>
       </tr>
@@ -31,9 +32,11 @@
   
         sensorData.forEach(data => {
           const row = sensorTableBody.insertRow();
-          const moistCell = row.insertCell(0);
-          const vibrCell = row.insertCell(1);
-  
+          const logTimeCell = row.insertCell(0);
+          const moistCell = row.insertCell(1);
+          const vibrCell = row.insertCell(2);
+          
+          logTimeCell.textContent = data.log_time;
           moistCell.textContent = data.soil_moisture;
           vibrCell.textContent = data.vibration;
         });
@@ -43,6 +46,7 @@
     }
   
     window.onload = fetchData;
+    setInterval(fetchData, 5000);
   </script>  
 </body>
 </html>
