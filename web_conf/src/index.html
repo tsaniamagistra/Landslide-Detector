@@ -21,7 +21,8 @@
   <script>
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:9000/view-log');
+        // Untuk pengguna: Ganti placeholder dengan alamat IP atau nama host server yang Anda gunakan di server.js
+        const response = await axios.get('http://placeholder:9000/view-log');
         console.log('Response data:', response.data);
         
         const sensorData = response.data.data.logs;

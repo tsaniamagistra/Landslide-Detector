@@ -1,4 +1,4 @@
-const { insertLogHandler, viewLogHandler } = require('./handler');
+const { insertLogHandler, viewLogHandler, checkConnectionHandler } = require('./handler');
 
 module.exports = [
   {
@@ -10,5 +10,10 @@ module.exports = [
     method: 'GET',
     path: '/view-log',
     handler: viewLogHandler
-  }
+  },
+  {
+    method: 'GET',
+    path: '/check-connection',
+    handler: checkConnectionHandler,
+  },
 ];

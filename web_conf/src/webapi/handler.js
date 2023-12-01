@@ -63,4 +63,8 @@ const viewLogHandler = async (request, h) => {
   }
 };
 
-module.exports = { insertLogHandler, viewLogHandler };
+const checkConnectionHandler = (request, h) => {
+  return 'Hello World!';
+};
+
+module.exports = { insertLogHandler, viewLogHandler, checkConnectionHandler };
