@@ -4,7 +4,7 @@ const routes = require('./routes');
 const init = async () => {
   const server = Hapi.server({
     port: 9000,
-    // Untuk pengguna: Ganti placeholder dengan alamat IP atau nama host dari server Anda
+    // Ganti placeholder dengan alamat IP atau nama host dari server
     host: 'placeholder',
     routes: {
       cors: {

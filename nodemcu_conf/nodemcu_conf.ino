@@ -2,10 +2,10 @@
 #include <ESP8266HTTPClient.h>
 
 /*
- Untuk pengguna: Ganti placeholder berikut:
- - placeholder1 = Nama SSID Wi-Fi Anda
- - placeholder2 = Kata sandi Wi-Fi Anda
- - placeholder3 = Alamat IP atau nama host server yang Anda gunakan di server.js
+ Ganti placeholder dengan:
+ - placeholder1 = Nama SSID Wi-Fi
+ - placeholder2 = Kata sandi Wi-Fi
+ - placeholder3 = Alamat IP atau nama host server yang digunakan di web_conf/src/webapi/server.js
  Pastikan bahwa NodeMCU dan server terhubung ke jaringan Wi-Fi yang sama.
 */
 const char *ssid = "placeholder1"; 
