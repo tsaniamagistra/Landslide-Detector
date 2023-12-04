@@ -14,6 +14,7 @@ const char *serverAddress = "http://placeholder3:9000";
 
 const int moist_pin = A0; // Pin sensor kelembaban tanah
 const int vibr_pin = D0; // Pin sensor getaran
+const int buzzerPin = D2; // Pin buzzer
 
 void setup() {
   Serial.begin(115200);
@@ -34,23 +35,28 @@ void setup() {
 void loop() {
   int soilMoisture = analogRead(moist_pin);
   int vibration = digitalRead(vibr_pin);
+  String level;
 
-  Serial.print("Soil Moisture: ");
+  level = checkLandslide(soilMoisture);
+  
+  Serial.print("Kelembaban Tanah: ");
   Serial.println(soilMoisture);
-  Serial.print("Vibration: ");
+  Serial.print("Getaran: ");
   Serial.println(vibration);
+  Serial.print("Level: ");
+  Serial.println(level);
+  
+  sendToServer(soilMoisture, vibration, level);
 
-  sendToServer(soilMoisture, vibration);
-
-  delay(15000);
+  delay(5000);
 }
 
-void sendToServer(int soilMoisture, int vibration) {
+void sendToServer(int soilMoisture, int vibration, String level) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     WiFiClient client;
 
-    String data = "moist=" + String(soilMoisture) + "&vibr=" + String(vibration);
+    String data = "moist=" + String(soilMoisture) + "&vibr=" + String(vibration) + "&level=" + String(level);
     String serverEndpoint = String(serverAddress) + "/insert-log";
 
     http.begin(client, serverEndpoint);
@@ -90,5 +96,27 @@ void checkServerConnection() {
     }
 
     http.end();
+  }
+}
+
+String checkLandslide(int soilMoisture) {
+  float moisturePercentage = map(soilMoisture, 1024, 0, 0, 100); // Konversi nilai sensor ke persen
+  
+  Serial.print("Persentase Kelembaban Tanah: ");
+  Serial.print(moisturePercentage);
+  Serial.println("%");
+  
+  if (moisturePercentage > 54) {
+    // Kondisi bahaya
+    tone(buzzerPin, 1000); // Nada frekuensi tinggi untuk peringatan bahaya
+    return "bahaya";
+  } else if (moisturePercentage >= 27 && moisturePercentage <= 54) {
+    // Kondisi siaga
+    noTone(buzzerPin); // Matikan buzzer
+    return "siaga";
+  } else {
+    // Kondisi normal
+    noTone(buzzerPin); // Matikan buzzer
+    return "normal";
   }
 }
