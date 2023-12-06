@@ -6,19 +6,19 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <style>
     .alert-danger {
-      background-color: #FF4500; /* Warna latar belakang untuk alert merah */
+      background-color: #FF4500;
     }
     .alert-warning {
-      background-color: #FFFF00; /* Warna latar belakang untuk alert kuning */
+      background-color: #FFFF00;
     }  
     .alert-success {
-      background-color: #ccffcc; /* Warna latar belakang untuk alert hijau */
+      background-color: #ccffcc;
     }  
     .alert-text {
-      color: black; /* Warna teks hitam untuk semua jenis alert */
-      padding: 5px; /* Padding untuk memberi ruang pada teks */
-      margin-bottom: 5px; /* Jarak antar alert */
-      text-align: center; /* Memusatkan teks dalam alert */
+      color: black;
+      padding: 5px;
+      margin-bottom: 5px;
+      text-align: center;
     }
   </style>
 </head>
@@ -27,8 +27,7 @@
     <h4>Pemantauan Potensi Longsor</h4>
   </div>
   <div class="container-fluid mt-2">
-    <div class="row" id="alert">
-    </div>
+    <div class="row" id="alert"></div>
     <div class="row" id="vibr"></div>
     <div class="row mt-2">
       <div class="col-md-6">
@@ -84,96 +83,92 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
   <script>
-async function fetchLogData(endpoint, tableId) {
-  try {
-    // Ganti placeholder dengan alamat IP atau nama host server yang digunakan di webapi/server.js
-    const response = await axios.get(`http://placeholder:9000/${endpoint}`);
-    const sensorData = response.data.data.logs;
-    const tableBody = document.querySelector(`#${tableId} tbody`);
-    tableBody.innerHTML = '';
+  async function fetchLogData(endpoint, tableId) {
+    try {
+      // Ganti placeholder dengan alamat IP atau nama host server yang digunakan di webapi/server.js
+      const response = await axios.get(`http://placeholder:9000/${endpoint}`);
+      const sensorData = response.data.data.logs;
+      const tableBody = document.querySelector(`#${tableId} tbody`);
+      tableBody.innerHTML = '';
 
-    sensorData.forEach(data => {
-      const row = tableBody.insertRow();
-      const logTimeCell = row.insertCell(0);
-      const moistCell = row.insertCell(1);
-      const vibrCell = row.insertCell(2);
-      const levelCell = row.insertCell(3);
+      sensorData.forEach(data => {
+        const row = tableBody.insertRow();
+        const logTimeCell = row.insertCell(0);
+        const moistCell = row.insertCell(1);
+        const vibrCell = row.insertCell(2);
+        const levelCell = row.insertCell(3);
 
-      const utcTime = new Date(data.log_time);
-      const utcOffset = 7 * 60;
-      const localTime = new Date(utcTime.getTime() + utcOffset * 60000);
+        const utcTime = new Date(data.log_time);
+        const utcOffset = 7 * 60;
+        const localTime = new Date(utcTime.getTime() + utcOffset * 60000);
 
-      logTimeCell.textContent = localTime.toISOString().replace('T', ' ').slice(0, 19);
-      moistCell.textContent = data.soil_moisture;
-      vibrCell.textContent = data.vibration;
-      levelCell.textContent = data.level;
-    });
-  } catch (error) {
-    console.error('Error fetching data:', error);
+        logTimeCell.textContent = localTime.toISOString().replace('T', ' ').slice(0, 19);
+        moistCell.textContent = data.soil_moisture;
+        vibrCell.textContent = data.vibration;
+        levelCell.textContent = data.level;
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }
-}
 
-async function fetchData() {
-      fetchLogData('view-log', 'sensorTable');
-      fetchLogData('view-bahaya', 'bahayaTable');
-      fetchLogData('view-siaga', 'siagaTable');
+  async function fetchData() {
+    fetchLogData('view-log', 'sensorTable');
+    fetchLogData('view-bahaya', 'bahayaTable');
+    fetchLogData('view-siaga', 'siagaTable');
 
-      // Check for danger level and vibration
-      const sensorTable = document.getElementById('sensorTable');
-      const dangerRows = sensorTable.querySelectorAll('tbody tr');
-      const hasDanger = Array.from(dangerRows).some(row => {
-        return row.cells[3].textContent === 'bahaya';
-      });
+    const sensorTable = document.getElementById('sensorTable');
+    const logRows = sensorTable.querySelectorAll('tbody tr');
+    
+    const hasBahaya = Array.from(logRows).some(row => {
+      return row.cells[3].textContent === 'bahaya';
+    });
+    const hasSiaga = Array.from(logRows).some(row => {
+      return row.cells[3].textContent === 'siaga';
+    });
+    const hasVibration = Array.from(logRows).some(row => {
+      return row.cells[2].textContent === '1.00';
+    });
 
-      const hasSiaga = Array.from(dangerRows).some(row => {
-        return row.cells[3].textContent === 'siaga';
-      });
+    const alertDiv = document.getElementById('alert');
+    const alertLevelDiv = document.createElement('div');
 
-      const hasVibration = Array.from(dangerRows).some(row => {
-        return row.cells[2].textContent === '1.00';
-      });
+    alertDiv.innerHTML = '';
 
-      // Update alert div
-      const alertDiv = document.getElementById('alert');
-      const alertLevelDiv = document.createElement('div');
-
-      alertDiv.innerHTML = '';
-
-      if (hasDanger) {
-  alertLevelDiv.textContent = 'TERDAPAT LEVEL BAHAYA';
-  alertLevelDiv.classList.add('alert-danger', 'alert-text', 'text-center', 'fw-bold');
-  alertDiv.appendChild(alertLevelDiv);
-} else if (hasSiaga) {
-  alertLevelDiv.textContent = 'TERDAPAT LEVEL SIAGA';
-  alertLevelDiv.classList.add('alert-warning', 'alert-text', 'text-center', 'fw-bold');
-  alertDiv.appendChild(alertLevelDiv);
-} else {
-  alertLevelDiv.textContent = 'NORMAL';
-  alertLevelDiv.classList.add('alert-success', 'alert-text', 'text-center', 'fw-bold');
-  alertDiv.appendChild(alertLevelDiv);
-}
-
-      // Update getaran div
-  const vibrDiv = document.getElementById('vibr');
-  vibrDiv.innerHTML = '';
-
-  if (hasVibration) {
-  const vibrText = document.createElement('div');
-  vibrText.textContent = 'TERDAPAT GETARAN';
-  vibrText.style.color = 'black';
-  vibrText.style.backgroundColor = '#FFDAB9';
-  vibrText.classList.add('alert-text', 'text-center', 'fw-bold');
-  vibrDiv.appendChild(vibrText);
-} else {
-  const noVibrText = document.createElement('div');
-  noVibrText.textContent = 'Tidak ada getaran';
-  noVibrText.classList.add('alert-text', 'text-center');
-  vibrDiv.appendChild(noVibrText);
-}
+    if (hasBahaya) {
+      alertLevelDiv.textContent = 'TERDAPAT LEVEL BAHAYA';
+      alertLevelDiv.classList.add('alert-danger', 'alert-text', 'text-center', 'fw-bold');
+      alertDiv.appendChild(alertLevelDiv);
+    } else if (hasSiaga) {
+      alertLevelDiv.textContent = 'TERDAPAT LEVEL SIAGA';
+      alertLevelDiv.classList.add('alert-warning', 'alert-text', 'text-center', 'fw-bold');
+      alertDiv.appendChild(alertLevelDiv);
+    } else {
+      alertLevelDiv.textContent = 'NORMAL';
+      alertLevelDiv.classList.add('alert-success', 'alert-text', 'text-center', 'fw-bold');
+      alertDiv.appendChild(alertLevelDiv);
     }
 
-window.onload = fetchData;
-setInterval(fetchData, 5000);
+    const vibrDiv = document.getElementById('vibr');
+    vibrDiv.innerHTML = '';
+
+    if (hasVibration) {
+      const vibrText = document.createElement('div');
+      vibrText.textContent = 'Terdapat getaran yang dapat memicu longsor!';
+      vibrText.style.color = 'black';
+      vibrText.style.backgroundColor = '#FFDAB9';
+      vibrText.classList.add('alert-text', 'text-center', 'fw-bold');
+      vibrDiv.appendChild(vibrText);
+    } else {
+      const noVibrText = document.createElement('div');
+      noVibrText.textContent = '';
+      noVibrText.classList.add('alert-text', 'text-center');
+      vibrDiv.appendChild(noVibrText);
+    }
+  }
+
+  window.onload = fetchData;
+  setInterval(fetchData, 5000);
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>  
